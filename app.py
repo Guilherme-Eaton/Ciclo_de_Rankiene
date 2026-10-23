@@ -5,7 +5,7 @@ from scipy.optimize import minimize_scalar
 from iapws import IAPWS97
 import streamlit as st
 st.title("Teste streamlit")
-st.sucess("Funcionando!")
+st.success("Funcionando!")
 
 # =====================================================
 # DADOS DO PROBLEMA
