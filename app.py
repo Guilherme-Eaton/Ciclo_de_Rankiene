@@ -4,6 +4,8 @@ from io import BytesIO
 
 from rankine_otimizacao import otimizar_rankine
 
+st.dataframe(df)
+
 st.set_page_config(
     page_title="Ciclo Rankine Regenerativo",
     layout="wide"
