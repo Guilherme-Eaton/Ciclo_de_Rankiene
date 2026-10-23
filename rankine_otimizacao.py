@@ -129,12 +129,37 @@ def ciclo_rankine(pi):
 # FUNÇÃO DE OTIMIZAÇÃO (100 PONTOS)
 # =====================================================
 
-def otimizar_rankine():
+def otimizar_rankine(
+    P_HIGH=10.0,
+    T_HIGH=500.0,
+    P_LOW=0.01,
+    ETA_T=0.80,
+    POTENCIA_LIQ=100000,
+    N=100
+):
+
+    globals()["P_HIGH"] = P_HIGH
+    globals()["P_LOW"] = P_LOW
+    globals()["ETA_T"] = ETA_T
+    globals()["POTENCIA_LIQ"] = POTENCIA_LIQ
+
+    estado1 = IAPWS97(P=P_LOW, x=0)
+
+    globals()["h1"] = estado1.h
+    globals()["v1"] = estado1.v
+
+    estado5 = IAPWS97(
+        P=P_HIGH,
+        T=T_HIGH + 273.15
+    )
+
+    globals()["h5"] = estado5.h
+    globals()["s5"] = estado5.s
 
     pressoes = np.logspace(
         np.log10(P_LOW),
         np.log10(P_HIGH),
-        100
+        int(N)
     )
 
     resultados = []
@@ -147,6 +172,7 @@ def otimizar_rankine():
             resultados.append(r)
 
     if len(resultados) == 0:
+
         raise Exception(
             "Nenhum ponto válido foi calculado."
         )
