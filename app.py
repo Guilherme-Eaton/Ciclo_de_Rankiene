@@ -1,7 +1,7 @@
 import streamlit as st
 import matplotlib.pyplot as plt
 
-from rankine_otimizacao import ciclo_rankine
+from rankine_otimizacao import otimizar_rankine
 
 st.title("Otimização do Ciclo Rankine Regenerativo")
 
