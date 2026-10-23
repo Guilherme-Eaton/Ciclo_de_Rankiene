@@ -29,93 +29,99 @@ eta_t = st.sidebar.number_input(
 
 n = st.sidebar.slider(
     "Número de pontos",
-    20,
-    500,
-    100
+    min_value=20,
+    max_value=500,
+    value=100
 )
 
 if st.button("Executar Otimização"):
 
-    df, otimo = ciclo_rankine(
-        P_HIGH=pH,
-        T_HIGH=TH,
-        P_LOW=pL,
-        ETA_T=eta_t,
-        N=n
-    )
+    try:
 
-    st.subheader("Resultados Ótimos")
-
-    col1, col2 = st.columns(2)
-
-    with col1:
-        st.metric(
-            "Pressão ótima (MPa)",
-            f"{otimo['pi_MPa']:.4f}"
+        # CHAMADA CORRIGIDA
+        df, otimo = ciclo_rankine(
+            pH,
+            TH,
+            pL,
+            eta_t,
+            100000,
+            n
         )
 
-        st.metric(
-            "Rendimento (%)",
-            f"{otimo['eta']*100:.2f}"
+        st.success("Cálculo concluído")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.metric(
+                "Pressão ótima (MPa)",
+                f"{otimo['pi_MPa']:.4f}"
+            )
+
+            st.metric(
+                "Rendimento (%)",
+                f"{otimo['eta']*100:.2f}"
+            )
+
+        with col2:
+            st.metric(
+                "Fração extraída",
+                f"{otimo['y']:.4f}"
+            )
+
+            st.metric(
+                "Vazão (kg/s)",
+                f"{otimo['mdot']:.2f}"
+            )
+
+        fig, ax = plt.subplots(figsize=(10, 6))
+
+        ax.plot(
+            df["pi_MPa"],
+            df["eta"] * 100,
+            linewidth=2
         )
 
-    with col2:
-        st.metric(
-            "Fração extraída",
-            f"{otimo['y']:.4f}"
+        ax.scatter(
+            otimo["pi_MPa"],
+            otimo["eta"] * 100,
+            color="red",
+            s=80,
+            label="Ótimo"
         )
 
-        st.metric(
-            "Vazão (kg/s)",
-            f"{otimo['mdot']:.2f}"
+        ax.set_xscale("log")
+
+        ax.set_xlabel(
+            "Pressão Intermediária (MPa)"
         )
 
-    # ===== GRÁFICO RANKINE =====
+        ax.set_ylabel(
+            "Rendimento (%)"
+        )
 
-    fig, ax = plt.subplots(figsize=(10, 6))
+        ax.set_title(
+            "Otimização da Pressão Intermediária"
+        )
 
-    ax.plot(
-        df["pi_MPa"],
-        df["eta"] * 100,
-        linewidth=2
-    )
+        ax.grid(True)
+        ax.legend()
 
-    ax.scatter(
-        otimo["pi_MPa"],
-        otimo["eta"] * 100,
-        color="red",
-        s=80,
-        label="Ótimo"
-    )
+        st.pyplot(fig)
 
-    ax.set_xscale("log")
+        st.subheader("Tabela Completa")
 
-    ax.set_xlabel(
-        "Pressão Intermediária (MPa)"
-    )
+        st.dataframe(df)
 
-    ax.set_ylabel(
-        "Rendimento Térmico (%)"
-    )
+        csv = df.to_csv(index=False)
 
-    ax.set_title(
-        "Otimização da Pressão Intermediária do Ciclo Rankine Regenerativo"
-    )
+        st.download_button(
+            "Baixar CSV",
+            csv,
+            "rankine.csv",
+            "text/csv"
+        )
 
-    ax.grid(True)
-    ax.legend()
+    except Exception as erro:
 
-    st.pyplot(fig)
-
-    st.subheader("Tabela Completa")
-
-    st.dataframe(df)
-
-    csv = df.to_csv(index=False)
-
-    st.download_button(
-        label="Baixar CSV",
-        data=csv,
-        file_name="rankine_otimizado.csv",
-        mime="text/csv"
-    )
+        st.error(f"Erro: {erro}")
