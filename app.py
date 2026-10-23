@@ -1,5 +1,6 @@
 import streamlit as st
 import matplotlib.pyplot as plt
+from io import BytesIO
 
 from rankine_otimizacao import otimizar_rankine
 
