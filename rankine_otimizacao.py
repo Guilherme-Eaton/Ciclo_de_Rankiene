@@ -40,134 +40,30 @@ s5 = estado5.s
 # FUNÇÃO DO CICLO
 # =====================================================
 
-def ciclo_rankine(pi):
-    try:
-        # -------------------------
-        # Estado 2
-        # -------------------------
-      
-        wb1 = v1 * ((pi - P_LOW) * 1000)
-        h2 = h1 + wb1
-      
-        # -------------------------
-        # Estado 3
-        # -------------------------
+def otimizar_rankine():
 
-        estado3 = IAPWS97(P=pi, x=0)
+    pressoes = np.logspace(
+        np.log10(P_LOW),
+        np.log10(P_HIGH),
+        100
+    )
 
-        h3 = estado3.h
-        v3 = estado3.v
+    resultados = []
 
-        # -------------------------
-        # Estado 4
-        # -------------------------
+    for pi in pressoes:
 
-        wb2 = v3 * ((P_HIGH - pi) * 1000)
-        h4 = h3 + wb2
+        r = ciclo_rankine(pi)
 
-        # -------------------------
-        # Estado 6s
-        # -------------------------
+        if r is not None:
+            resultados.append(r)
 
-        estado6s = IAPWS97(
-            P=pi,
-            s=s5
-        )
+    df = pd.DataFrame(resultados)
 
-        h6s = estado6s.h
-        h6 = h5 - ETA_T * (h5 - h6s)
-        estado6 = IAPWS97(
-            P=pi,
-            h=h6
-        )
+    indice = df["eta"].idxmax()
 
-        s6 = estado6.s
+    otimo = df.loc[indice]
 
-        # -------------------------
-        # Estado 7s
-        # -------------------------
-
-        estado7s = IAPWS97(
-            P=P_LOW,
-            s=s6
-        )
-
-        h7s = estado7s.h
-
-        h7 = h6 - ETA_T * (h6 - h7s)
-
-        # -------------------------
-        # Fração extraída
-        # -------------------------
-
-        y = (h3 - h2) / (h6 - h2)
-
-        if y <= 0 or y >= 1:
-            return None
-
-        # -------------------------
-        # Turbina
-        # -------------------------
-
-        wt = (
-            (h5 - h6)
-            +
-            (1 - y) * (h6 - h7)
-        )
-
-        # -------------------------
-        # Bombas
-        # -------------------------
-
-        wb = (
-            (1 - y) * (h2 - h1)
-            +
-            (h4 - h3)
-        )
-
-        # -------------------------
-        # Trabalho líquido
-        # -------------------------
-
-        wliq = wt - wb
-
-        # -------------------------
-        # Calor fornecido
-        # -------------------------
-
-        qin = h5 - h4
-
-        # -------------------------
-        # Rendimento
-        # -------------------------
-
-        eta = wliq / qin
-
-        # -------------------------
-        # Vazão mássica
-        # -------------------------
-
-        mdot = POTENCIA_LIQ / wliq
-
-        return {
-
-            "pi": pi,
-            "h2": h2,
-            "h3": h3,
-            "h4": h4,
-            "h6": h6,
-            "h7": h7,
-            "y": y,
-            "wt": wt,
-            "wb": wb,
-            "wliq": wliq,
-            "qin": qin,
-            "eta": eta,
-            "mdot": mdot
-        }
-
-    except:
-        return None
+    return df, otimo
 
 # =====================================================
 # 100 PONTOS
