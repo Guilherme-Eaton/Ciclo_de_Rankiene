@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from scipy.optimize import minimize_scalar
 from iapws import IAPWS97
 import streamlit as st
-st.title("teste streamlit")
+st.title("Teste streamlit")
 st.sucess("Funcionando!")
 
 # =====================================================
