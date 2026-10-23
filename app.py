@@ -10,44 +10,75 @@ st.set_page_config(
 
 st.title("Otimização do Ciclo Rankine Regenerativo")
 
-st.write(
-    "Clique no botão para calcular 100 pressões intermediárias "
-    "e encontrar a pressão ótima."
+# ===================================
+# SIDEBAR
+# ===================================
+
+st.sidebar.header("Parâmetros")
+
+mostrar_tabela = st.sidebar.checkbox(
+    "Mostrar tabela completa",
+    value=True
 )
+
+mostrar_grafico = st.sidebar.checkbox(
+    "Mostrar gráfico",
+    value=True
+)
+
+# ===================================
+# BOTÃO
+# ===================================
 
 if st.button("Executar Otimização"):
 
-    try:
+    with st.spinner("Calculando..."):
 
         df, otimo = otimizar_rankine()
 
-        st.success("Cálculo concluído!")
+    st.success("Cálculo concluído!")
 
-        col1, col2 = st.columns(2)
+    # ===================================
+    # RESULTADOS
+    # ===================================
 
-        with col1:
-            st.metric(
-                "Pressão Ótima (MPa)",
-                f"{otimo['pi']:.4f}"
-            )
+    col1, col2, col3, col4 = st.columns(4)
 
-            st.metric(
-                "Rendimento (%)",
-                f"{otimo['eta'] * 100:.2f}"
-            )
+    with col1:
+        st.metric(
+            "Pressão ótima (MPa)",
+            f"{otimo['pi']:.4f}"
+        )
 
-        with col2:
-            st.metric(
-                "Fração Extraída",
-                f"{otimo['y']:.4f}"
-            )
+    with col2:
+        st.metric(
+            "Rendimento (%)",
+            f"{otimo['eta'] * 100:.2f}"
+        )
 
-            st.metric(
-                "Vazão (kg/s)",
-                f"{otimo['mdot']:.2f}"
-            )
+    with col3:
+        st.metric(
+            "Fração extraída",
+            f"{otimo['y']:.4f}"
+        )
 
-        fig, ax = plt.subplots(figsize=(10, 6))
+    with col4:
+        st.metric(
+            "Vazão (kg/s)",
+            f"{otimo['mdot']:.2f}"
+        )
+
+    # ===================================
+    # GRÁFICO
+    # ===================================
+
+    if mostrar_grafico:
+
+        st.subheader("Curva de Otimização")
+
+        fig, ax = plt.subplots(
+            figsize=(10, 6)
+        )
 
         ax.plot(
             df["pi"],
@@ -73,22 +104,34 @@ if st.button("Executar Otimização"):
             "Rendimento (%)"
         )
 
-        ax.set_title(
-            "Rendimento × Pressão Intermediária"
-        )
-
         ax.grid(True)
 
         ax.legend()
 
         st.pyplot(fig)
 
-        st.subheader("Tabela Completa")
+    # ===================================
+    # TABELA
+    # ===================================
 
-        st.dataframe(df)
+    if mostrar_tabela:
 
-    except Exception as erro:
+        st.subheader("Resultados Calculados")
 
-        st.error(
-            f"Erro: {erro}"
+        st.dataframe(
+            df,
+            use_container_width=True
         )
+
+    # ===================================
+    # DOWNLOAD CSV
+    # ===================================
+
+    csv = df.to_csv(index=False)
+
+    st.download_button(
+        label="📥 Baixar CSV",
+        data=csv,
+        file_name="rankine_resultados.csv",
+        mime="text/csv"
+    )
