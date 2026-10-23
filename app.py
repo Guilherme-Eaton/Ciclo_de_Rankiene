@@ -9,7 +9,7 @@ if st.button("Executar Otimização"):
 
     try:
 
-        df, otimo = ciclo_rankine()
+        df, otimo = otimizar_rankine()
 
         st.success("Cálculo executado com sucesso!")
 
