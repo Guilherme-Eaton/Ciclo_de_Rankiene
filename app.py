@@ -1,8 +1,23 @@
 import streamlit as st
+from rankine_otimizacao import ciclo_rankine
 
-st.title("Teste")
+st.title("Diagnóstico Rankine")
 
-st.write("App carregado")
+if st.button("Executar"):
 
-if st.button("Testar"):
-    st.success("Botão funcionando")
+    try:
+
+        st.write("Antes da função")
+
+        df, otimo = ciclo_rankine()
+
+        st.write("Função executada")
+
+        st.write(df.head())
+
+        st.write(otimo)
+
+    except Exception as e:
+
+        st.error(str(e))
+        
