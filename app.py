@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 from scipy.optimize import minimize_scalar
 from iapws import IAPWS97
 import streamlit as st
- 
-st.title("Otimização do Ciclo Rankine")
+st.title("teste streamlit")
+st.sucess("Funcionando!")
 
 # =====================================================
 # DADOS DO PROBLEMA
